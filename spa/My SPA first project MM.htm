@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JD Generator — для HR-команд</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --mint: #3ECFB2;
+    --sky: #6EB5FF;
+    --lavender: #A78BFA;
+    --orange: #FF8C42;
+    --text: #1A1A2E;
+    --secondary: #6B7280;
+    --bg: #F7FAFA;
+    --white: #FFFFFF;
+    --border: #E5E7EB;
+    --mint-light: #EDFAF6;
+    --sky-light: #EBF4FF;
+    --lavender-light: #F3EFFE;
+    --error: #FF8C42;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--mint), var(--sky));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+  }
+  .header-tag {
+    background: var(--mint-light);
+    color: var(--mint);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 16px 60px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .card-subtitle {
+    font-size: 14px;
+    color: var(--secondary);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* FORM */
+  .field {
+    margin-bottom: 18px;
+  }
+  .field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 7px;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder { color: #C2C8D0; }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--mint);
+    box-shadow: 0 0 0 3px rgba(62,207,178,0.12);
+  }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+  .field textarea { resize: vertical; min-height: 84px; line-height: 1.6; }
+  .field.error input,
+  .field.error select,
+  .field.error textarea { border-color: var(--error); }
+  .field-error {
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 5px;
+    display: none;
+    font-weight: 500;
+  }
+  .field.error .field-error { display: block; }
+
+  /* GENERATE BUTTON */
+  .btn-generate {
+    width: 100%;
+    height: 52px;
+    background: var(--orange);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 8px;
+    letter-spacing: 0.2px;
+  }
+  .btn-generate:hover:not(:disabled) { background: #e67d35; }
+  .btn-generate:active:not(:disabled) { transform: scale(0.97); }
+  .btn-generate:disabled { opacity: 0.75; cursor: not-allowed; }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    height: 3px;
+    background: #E5E7EB;
+    border-radius: 2px;
+    margin-top: 12px;
+    overflow: hidden;
+    display: none;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--mint), var(--sky));
+    border-radius: 2px;
+    width: 0%;
+    transition: width 1.2s ease;
+  }
+
+  /* RESULT CARD */
+  .result-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    padding: 28px;
+    animation: fadeSlideUp 0.4s ease forwards;
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--secondary);
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .tab.active-hh { color: var(--mint); background: var(--mint-light); }
+  .tab.active-tg { color: var(--sky); background: var(--sky-light); }
+  .tab.active-portal { color: var(--lavender); background: var(--lavender-light); }
+
+  /* RESULT TEXT */
+  .result-text {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 220px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text);
+    white-space: pre-wrap;
+    font-family: inherit;
+    transition: opacity 0.2s;
+  }
+
+  /* COPY BUTTON */
+  .btn-copy {
+    border: 1.5px solid var(--mint);
+    color: var(--mint);
+    background: var(--white);
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-weight: 600;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 14px;
+    display: inline-block;
+  }
+  .btn-copy:hover { background: var(--mint-light); }
+  .btn-copy.copied { background: var(--mint-light); }
+
+  .btn-reset {
+    display: block;
+    background: none;
+    border: none;
+    color: var(--secondary);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 14px;
+    text-decoration: none;
+    padding: 0;
+  }
+  .btn-reset:hover { text-decoration: underline; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    font-size: 13px;
+    color: var(--secondary);
+    padding: 24px 16px;
+  }
+  .footer-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    background: var(--orange);
+    border-radius: 50%;
+    vertical-align: middle;
+    margin: 0 8px;
+    position: relative;
+    top: -1px;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <span class="logo">JD Generator</span>
+    <span class="header-tag">для HR-команд</span>
+  </div>
+</header>
+
+<main class="main" id="main">
+  <div class="card" id="form-card">
+    <h1 class="card-title">Параметры вакансии</h1>
+    <p class="card-subtitle">Заполни 5 полей — получи готовые тексты для всех площадок</p>
+
+    <div class="field" id="field-role">
+      <label for="role">Название роли *</label>
+      <input type="text" id="role" placeholder="например: Product Manager, Data Analyst, iOS Developer">
+      <div class="field-error">Это поле обязательно</div>
+    </div>
+
+    <div class="field" id="field-grade">
+      <label for="grade">Грейд *</label>
+      <select id="grade">
+        <option value="">Выбери грейд</option>
+        <option>Intern</option>
+        <option>Junior</option>
+        <option>Middle</option>
+        <option>Senior</option>
+        <option>Lead</option>
+        <option>Head</option>
+        <option>Director</option>
+      </select>
+      <div class="field-error">Это поле обязательно</div>
+    </div>
+
+    <div class="field" id="field-team">
+      <label for="team">Команда или отдел</label>
+      <input type="text" id="team" placeholder="например: Продуктовая команда, Отдел аналитики, Fintech Core">
+    </div>
+
+    <div class="field" id="field-tasks">
+      <label for="tasks">Ключевые задачи *</label>
+      <textarea id="tasks" rows="3" placeholder="Опиши 2-4 главные задачи. например: управление бэклогом, работа с метриками, запуск новых фич"></textarea>
+      <div class="field-error">Это поле обязательно</div>
+    </div>
+
+    <div class="field" id="field-requirements">
+      <label for="requirements">Требования к кандидату *</label>
+      <textarea id="requirements" rows="3" placeholder="Опиши ключевые требования. например: опыт от 3 лет, знание SQL, работа в Agile-команде"></textarea>
+      <div class="field-error">Это поле обязательно</div>
+    </div>
+
+    <button class="btn-generate" id="btn-generate" onclick="handleGenerate()">Сгенерировать JD →</button>
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <div id="result-container"></div>
+</main>
+
+<footer>
+  JD Generator<span class="footer-dot"></span>Инструмент для HR-команд
+</footer>
+
+<script>
+  function parseItems(text) {
+    if (!text.trim()) return [];
+    let items;
+    if (text.includes('\n')) {
+      items = text.split('\n');
+    } else if (text.includes(',')) {
+      items = text.split(',');
+    } else {
+      return [text.trim()];
+    }
+    return items.map(i => i.trim()).filter(Boolean);
+  }
+
+  function formatBullets(text, prefix) {
+    const items = parseItems(text);
+    if (items.length === 1) return prefix + ' ' + items[0];
+    return items.map(i => prefix + ' ' + i).join('\n');
+  }
+
+  function generateHH(role, grade, team, tasks, requirements) {
+    const teamStr = team || 'нашей команде';
+    return `${role} | ${grade} | Финтех
+
+О роли:
+Мы ищем ${role} (${grade}) в ${teamStr}. Если тебе интересно работать в быстрорастущей финтех-компании и ты готов(а) брать на себя ответственность — давай познакомимся.
+
+Чем предстоит заниматься:
+${formatBullets(tasks, '•')}
+
+Что мы ожидаем:
+${formatBullets(requirements, '•')}
+
+Что мы предлагаем:
+• Работа в финтех-компании с масштабом 1400+ человек
+• Возможности для роста внутри компании
+• Сильная команда и реальное влияние на продукт
+• Конкурентная компенсация обсуждается индивидуально
+
+Откликайся — и давай обсудим детали.`;
+  }
+
+  function generateTelegram(role, grade, team, tasks, requirements) {
+    const teamStr = team || 'наша команда';
+    return `🚀 Открыта вакансия: ${role} (${grade})
+
+🏢 Команда: ${teamStr}
+
+📌 Задачи:
+${formatBullets(tasks, '•')}
+
+✅ Ожидаем:
+${formatBullets(requirements, '•')}
+
+💼 Финтех, 1400+ человек, растущая компания
+
+👉 Пиши в личку или откликайся по ссылке ниже`;
+  }
+
+  function generatePortal(role, grade, team, tasks, requirements) {
+    const teamStr = team || 'не указано';
+    return `ОТКРЫТА ВНУТРЕННЯЯ ВАКАНСИЯ
+
+Должность: ${role}
+Уровень: ${grade}
+Подразделение: ${teamStr}
+Статус: Активный набор
+
+ОПИСАНИЕ РОЛИ:
+Открыта позиция ${role} уровня ${grade} в подразделении ${teamStr}. Приглашаем к участию как внешних кандидатов, так и сотрудников компании в рамках программы внутренней мобильности.
+
+ОСНОВНЫЕ ФУНКЦИИ:
+${formatBullets(tasks, '—')}
+
+ТРЕБОВАНИЯ:
+${formatBullets(requirements, '—')}
+
+ДЛЯ ОТКЛИКА:
+Обратитесь к вашему HR-партнёру или направьте резюме во внутреннюю систему подбора.
+
+Контакт: HR-команда`;
+  }
+
+  function validate() {
+    const required = [
+      { id: 'role', fieldId: 'field-role' },
+      { id: 'grade', fieldId: 'field-grade' },
+      { id: 'tasks', fieldId: 'field-tasks' },
+      { id: 'requirements', fieldId: 'field-requirements' },
+    ];
+    let valid = true;
+    required.forEach(({ id, fieldId }) => {
+      const el = document.getElementById(id);
+      const field = document.getElementById(fieldId);
+      const val = el.value.trim();
+      if (!val) {
+        field.classList.add('error');
+        valid = false;
+        el.addEventListener('input', () => field.classList.remove('error'), { once: true });
+        el.addEventListener('change', () => field.classList.remove('error'), { once: true });
+      } else {
+        field.classList.remove('error');
+      }
+    });
+    return valid;
+  }
+
+  function handleGenerate() {
+    if (!validate()) return;
+
+    const btn = document.getElementById('btn-generate');
+    const progressWrap = document.getElementById('progress-wrap');
+    const progressBar = document.getElementById('progress-bar');
+
+    btn.disabled = true;
+    btn.textContent = 'Генерирую···';
+    progressWrap.style.display = 'block';
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        progressBar.style.width = '100%';
+      });
+    });
+
+    setTimeout(() => {
+      const role = document.getElementById('role').value.trim();
+      const grade = document.getElementById('grade').value.trim();
+      const team = document.getElementById('team').value.trim();
+      const tasks = document.getElementById('tasks').value.trim();
+      const requirements = document.getElementById('requirements').value.trim();
+
+      const versions = {
+        hh: generateHH(role, grade, team, tasks, requirements),
+        tg: generateTelegram(role, grade, team, tasks, requirements),
+        portal: generatePortal(role, grade, team, tasks, requirements),
+      };
+
+      renderResult(versions);
+
+      btn.disabled = false;
+      btn.textContent = 'Сгенерировать JD →';
+      progressWrap.style.display = 'none';
+      progressBar.style.width = '0%';
+      progressBar.style.transition = 'none';
+      requestAnimationFrame(() => { progressBar.style.transition = 'width 1.2s ease'; });
+    }, 1200);
+  }
+
+  let currentTab = 'hh';
+  let currentVersions = {};
+
+  function renderResult(versions) {
+    currentVersions = versions;
+    currentTab = 'hh';
+
+    const container = document.getElementById('result-container');
+    container.innerHTML = `
+      <div class="result-card" id="result-card">
+        <h2 class="card-title">Готово! Выбери формат:</h2>
+        <p class="card-subtitle">Три версии из одного ввода</p>
+
+        <div class="tabs">
+          <button class="tab active-hh" id="tab-hh" onclick="switchTab('hh')">HH.ru</button>
+          <button class="tab" id="tab-tg" onclick="switchTab('tg')">Telegram</button>
+          <button class="tab" id="tab-portal" onclick="switchTab('portal')">Портал</button>
+        </div>
+
+        <div class="result-text" id="result-text"></div>
+
+        <div>
+          <button class="btn-copy" id="btn-copy" onclick="copyText()">📋 Скопировать текст</button>
+          <button class="btn-reset" onclick="resetForm()">← Создать новый JD</button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('result-text').textContent = versions.hh;
+    setTimeout(() => {
+      document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    const textEl = document.getElementById('result-text');
+    textEl.style.opacity = '0';
+    setTimeout(() => {
+      textEl.textContent = currentVersions[tab];
+      textEl.style.opacity = '1';
+    }, 100);
+
+    const tabClasses = { hh: 'active-hh', tg: 'active-tg', portal: 'active-portal' };
+    ['hh', 'tg', 'portal'].forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      el.className = 'tab';
+      if (t === tab) el.classList.add(tabClasses[t]);
+    });
+
+    // Reset copy button
+    const copyBtn = document.getElementById('btn-copy');
+    copyBtn.textContent = '📋 Скопировать текст';
+    copyBtn.classList.remove('copied');
+  }
+
+  function copyText() {
+    const text = currentVersions[currentTab];
+    const btn = document.getElementById('btn-copy');
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => showCopied(btn));
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showCopied(btn);
+    }
+  }
+
+  function showCopied(btn) {
+    btn.textContent = '✅ Скопировано!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 Скопировать текст';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+
+  function resetForm() {
+    document.getElementById('result-container').innerHTML = '';
+    ['role', 'team', 'tasks', 'requirements'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('grade').value = '';
+    ['field-role', 'field-grade', 'field-tasks', 'field-requirements'].forEach(id => {
+      document.getElementById(id).classList.remove('error');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
