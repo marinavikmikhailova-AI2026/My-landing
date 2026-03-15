@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JD Generator — для HR-команд</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #10B981;
+  --green-light: #D1FAE5;
+  --green-mid: #6EE7B7;
+  --blue: #3B82F6;
+  --blue-light: #DBEAFE;
+  --blue-mid: #93C5FD;
+  --teal: #14B8A6;
+  --teal-light: #CCFBF1;
+  --text: #0F172A;
+  --text2: #475569;
+  --text3: #94A3B8;
+  --bg: #F0FDF8;
+  --white: #FFFFFF;
+  --border: #C7F0E3;
+  --border2: #BAE6FD;
+  --error: #F43F5E;
+  --error-light: #FFE4E6;
+  --display: 'Fraunces', serif;
+  --body: 'Nunito', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Soft ambient blobs */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px);
+}
+.blob-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+  top: -150px; left: -150px;
+}
+.blob-2 {
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
+  bottom: -100px; right: -100px;
+}
+.blob-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(20,184,166,0.08) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* HEADER */
+.header {
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(199,240,227,0.8);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-inner {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  font-family: var(--display);
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.logo-mark {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--green), var(--blue));
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: white;
+  font-family: var(--body);
+  font-weight: 900;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+}
+.header-pill {
+  background: linear-gradient(135deg, var(--green-light), var(--blue-light));
+  border: 1px solid var(--border);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.pill-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: glow 2s ease-in-out infinite;
+}
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 6px var(--green); opacity: 1; }
+  50% { box-shadow: 0 0 2px var(--green); opacity: 0.6; }
+}
+
+/* MAIN */
+.main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 36px 20px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* HERO TEXT */
+.hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.hero-title {
+  font-family: var(--display);
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+.hero-title span {
+  background: linear-gradient(135deg, var(--green), var(--teal), var(--blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 15px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* CARD */
+.card {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  border: 1px solid rgba(199,240,227,0.9);
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 32px rgba(16,185,129,0.06), 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* FORM */
+.field { margin-bottom: 18px; }
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 7px;
+}
+.req { color: var(--green); font-size: 15px; line-height: 1; }
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  background: rgba(240,253,248,0.6);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 15px;
+  font-size: 14px;
+  font-family: var(--body);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.field input::placeholder,
+.field textarea::placeholder { color: var(--text3); }
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--green-mid);
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 0 0 4px rgba(16,185,129,0.1);
+}
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2310B981' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 13px center;
+  background-color: rgba(240,253,248,0.6);
+  padding-right: 36px;
+  cursor: pointer;
+}
+.field textarea { resize: vertical; min-height: 90px; line-height: 1.65; }
+
+.field.error input,
+.field.error select,
+.field.error textarea {
+  border-color: rgba(244,63,94,0.4);
+  background: var(--error-light);
+  box-shadow: 0 0 0 4px rgba(244,63,94,0.06);
+}
+.field-error {
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 5px;
+  display: none;
+  font-weight: 600;
+}
+.field.error .field-error { display: block; }
+
+/* TWO COL */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
+
+/* GENERATE BUTTON */
+.btn-generate {
+  width: 100%;
+  height: 54px;
+  background: linear-gradient(135deg, var(--green) 0%, var(--teal) 50%, var(--blue) 100%);
+  background-size: 200% 200%;
+  color: white;
+  font-size: 15px;
+  font-weight: 800;
+  font-family: var(--body);
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s, background-position 0.4s;
+  margin-top: 10px;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(16,185,129,0.35);
+  background-position: 0% 50%;
+}
+.btn-generate:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(16,185,129,0.4);
+  background-position: 100% 50%;
+}
+.btn-generate:active:not(:disabled) { transform: scale(0.98) translateY(0); }
+.btn-generate:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* LOADING BAR */
+.loading-wrap {
+  height: 3px;
+  background: var(--green-light);
+  border-radius: 2px;
+  margin-top: 14px;
+  overflow: hidden;
+  display: none;
+}
+.loading-bar {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--green), var(--teal), var(--blue), var(--green));
+  background-size: 300% 100%;
+  width: 100%;
+  animation: flow 1.8s linear infinite;
+}
+@keyframes flow {
+  0% { background-position: 100% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.error-banner {
+  background: var(--error-light);
+  border: 1px solid rgba(244,63,94,0.2);
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 13px;
+  color: var(--error);
+  margin-top: 12px;
+  display: none;
+  font-weight: 600;
+}
+
+/* RESULT CARD */
+.result-card {
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  border: 1px solid rgba(186,230,253,0.9);
+  padding: 28px;
+  box-shadow: 0 4px 32px rgba(59,130,246,0.07), 0 1px 4px rgba(0,0,0,0.04);
+  animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.result-title {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.4px;
+  margin-bottom: 4px;
+}
+.result-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 22px;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  background: rgba(240,253,248,0.8);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  width: fit-content;
+}
+.tab {
+  padding: 7px 20px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--body);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  transition: all 0.2s;
+}
+.tab:hover:not(:disabled) { color: var(--text); background: rgba(255,255,255,0.6); }
+.tab:disabled { opacity: 0.4; cursor: not-allowed; }
+.tab.active-hh {
+  background: white;
+  color: var(--green);
+  box-shadow: 0 2px 10px rgba(16,185,129,0.15);
+}
+.tab.active-tg {
+  background: white;
+  color: var(--blue);
+  box-shadow: 0 2px 10px rgba(59,130,246,0.15);
+}
+.tab.active-portal {
+  background: white;
+  color: var(--teal);
+  box-shadow: 0 2px 10px rgba(20,184,166,0.15);
+}
+
+/* Tab progress indicators */
+.tab-spinner {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-left: 5px;
+  opacity: 0.6;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.tab-check {
+  display: inline-block;
+  margin-left: 5px;
+  font-style: normal;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+  font-size: 11px;
+}
+.tab-check.hh { color: var(--green); }
+.tab-check.tg { color: var(--blue); }
+.tab-check.portal { color: var(--teal); }
+
+/* RESULT TEXT */
+.result-text {
+  background: linear-gradient(135deg, rgba(240,253,248,0.7), rgba(239,246,255,0.7));
+  border: 1px solid rgba(199,240,227,0.6);
+  border-radius: 14px;
+  padding: 20px;
+  min-height: 240px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--text2);
+  white-space: pre-wrap;
+  font-family: var(--body);
+  transition: opacity 0.15s;
+}
+.result-text.streaming::after {
+  content: '|';
+  color: var(--green);
+  animation: blink 0.7s step-start infinite;
+  font-weight: 300;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.btn-copy {
+  background: linear-gradient(135deg, var(--green-light), var(--blue-light));
+  border: 1.5px solid var(--border);
+  color: var(--green);
+  border-radius: 10px;
+  padding: 9px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--body);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-copy:hover { box-shadow: 0 4px 14px rgba(16,185,129,0.2); transform: translateY(-1px); }
+.btn-copy.copied { background: var(--green-light); border-color: var(--green-mid); }
+.btn-copy:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-reset {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 13px;
+  font-family: var(--body);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+.btn-reset:hover { color: var(--text2); }
+
+/* DOTS LOADER */
+.dots {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+.dots span {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: white;
+  animation: bounce 1.2s ease-in-out infinite;
+}
+.dots span:nth-child(2) { animation-delay: 0.2s; }
+.dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0.5); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* DIVIDER */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 28px 0;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text3);
+  padding: 20px 20px 32px;
+  position: relative;
+  z-index: 1;
+  font-weight: 600;
+}
+footer strong { color: var(--green); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">J</div>
+      JD Generator
+    </div>
+    <div class="header-pill">
+      <div class="pill-dot"></div>
+      AI активен
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="hero">
+    <h1 class="hero-title">Создай вакансию<br><span>за секунды</span></h1>
+    <p class="hero-sub">Заполни поля — Claude напишет тексты для HH, Telegram и корпоративного портала</p>
+  </div>
+
+  <div class="card" id="form-card">
+    <div class="field-row">
+      <div class="field" id="field-role">
+        <div class="field-label">Название роли <span class="req">*</span></div>
+        <input type="text" id="role" placeholder="Product Manager">
+        <div class="field-error">Обязательное поле</div>
+      </div>
+      <div class="field" id="field-grade">
+        <div class="field-label">Грейд <span class="req">*</span></div>
+        <select id="grade">
+          <option value="">— выбрать —</option>
+          <option>Intern</option>
+          <option>Junior</option>
+          <option>Middle</option>
+          <option>Senior</option>
+          <option>Lead</option>
+          <option>Head</option>
+          <option>Director</option>
+        </select>
+        <div class="field-error">Обязательное поле</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <div class="field-label">Команда или отдел</div>
+        <input type="text" id="team" placeholder="Fintech Core">
+      </div>
+      <div class="field">
+        <div class="field-label">Тон и стиль</div>
+        <select id="tone">
+          <option value="">Профессиональный</option>
+          <option value="friendly">Дружелюбный</option>
+          <option value="startup">Стартап-энергия</option>
+          <option value="corporate">Корпоративный</option>
+          <option value="creative">Творческий</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field" id="field-tasks">
+      <div class="field-label">Ключевые задачи <span class="req">*</span></div>
+      <textarea id="tasks" rows="3" placeholder="управление бэклогом, работа с метриками, запуск новых фич"></textarea>
+      <div class="field-error">Обязательное поле</div>
+    </div>
+
+    <div class="field" id="field-requirements">
+      <div class="field-label">Требования к кандидату <span class="req">*</span></div>
+      <textarea id="requirements" rows="3" placeholder="опыт от 3 лет, знание SQL, работа в Agile-команде"></textarea>
+      <div class="field-error">Обязательное поле</div>
+    </div>
+
+    <button class="btn-generate" id="btn-generate" onclick="handleGenerate()">
+      <span id="btn-text">✨ Сгенерировать с AI</span>
+    </button>
+    <div class="loading-wrap" id="loading-wrap">
+      <div class="loading-bar"></div>
+    </div>
+    <div class="error-banner" id="error-banner"></div>
+  </div>
+
+  <div id="result-container"></div>
+
+</main>
+
+<footer>JD Generator &nbsp;·&nbsp; Powered by <strong>Claude AI</strong> &nbsp;·&nbsp; для HR-команд</footer>
+
+<script>
+let currentTab = 'hh';
+let currentVersions = { hh: '', tg: '', portal: '' };
+let generationDone = { hh: false, tg: false, portal: false };
+
+function validate() {
+  const fields = [
+    { id: 'role', fieldId: 'field-role' },
+    { id: 'grade', fieldId: 'field-grade' },
+    { id: 'tasks', fieldId: 'field-tasks' },
+    { id: 'requirements', fieldId: 'field-requirements' },
+  ];
+  let valid = true;
+  fields.forEach(({ id, fieldId }) => {
+    const el = document.getElementById(id);
+    const wrap = document.getElementById(fieldId);
+    if (!el.value.trim()) {
+      wrap.classList.add('error');
+      valid = false;
+      el.addEventListener('input', () => wrap.classList.remove('error'), { once: true });
+      el.addEventListener('change', () => wrap.classList.remove('error'), { once: true });
+    } else {
+      wrap.classList.remove('error');
+    }
+  });
+  return valid;
+}
+
+function buildPrompt(format, role, grade, team, tasks, requirements, tone) {
+  const tones = {
+    friendly: 'дружелюбный, тёплый, на "ты"',
+    startup: 'энергичный, стартап-стиль',
+    corporate: 'официальный, формальный',
+    creative: 'творческий, с характером',
+    '': 'профессиональный, современный'
+  };
+  const t = tones[tone] || tones[''];
+  const teamStr = team || 'команде компании';
+  if (format === 'hh') return `Напиши вакансию для HH.ru на русском. Роль: ${role} (${grade}), команда: ${teamStr}, задачи: ${tasks}, требования: ${requirements}, тон: ${t}.
+Структура: заголовок | грейд | описание, "О роли:" 2-3 предложения, "Чем предстоит заниматься:" список (•), "Что мы ожидаем:" список (•), "Что мы предлагаем:" 4-5 пунктов (•), призыв. Пиши живо, без штампов. Только текст.`;
+  if (format === 'tg') return `Напиши вакансию для Telegram-канала. Роль: ${role} (${grade}), команда: ${teamStr}, задачи: ${tasks}, требования: ${requirements}, тон: ${t}. Компактный пост с эмодзи, 15-20 строк. Только текст.`;
+  return `Напиши вакансию для внутреннего HR-портала. Роль: ${role} (${grade}), подразделение: ${teamStr}, задачи: ${tasks}, требования: ${requirements}, тон: ${t}. Официальная структура: ОТКРЫТА ВАКАНСИЯ, реквизиты, ОПИСАНИЕ РОЛИ, ФУНКЦИИ (—), ТРЕБОВАНИЯ (—), ДЛЯ ОТКЛИКА. Только текст.`;
+}
+
+async function handleGenerate() {
+  if (!validate()) return;
+
+  const btn = document.getElementById('btn-generate');
+  const btnText = document.getElementById('btn-text');
+  const loadingWrap = document.getElementById('loading-wrap');
+  const errorBanner = document.getElementById('error-banner');
+
+  const role = document.getElementById('role').value.trim();
+  const grade = document.getElementById('grade').value.trim();
+  const team = document.getElementById('team').value.trim();
+  const tasks = document.getElementById('tasks').value.trim();
+  const requirements = document.getElementById('requirements').value.trim();
+  const tone = document.getElementById('tone').value;
+
+  btn.disabled = true;
+  btnText.innerHTML = 'Генерирую <span class="dots"><span></span><span></span><span></span></span>';
+  loadingWrap.style.display = 'block';
+  errorBanner.style.display = 'none';
+
+  currentVersions = { hh: '', tg: '', portal: '' };
+  generationDone = { hh: false, tg: false, portal: false };
+  currentTab = 'hh';
+
+  renderShell();
+
+  try {
+    await Promise.all(['hh', 'tg', 'portal'].map(async (fmt) => {
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            stream: true,
+            messages: [{ role: 'user', content: buildPrompt(fmt, role, grade, team, tasks, requirements, tone) }]
+          })
+        });
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error?.message || `HTTP ${res.status}`); }
+
+        const reader = res.body.getReader();
+        const dec = new TextDecoder();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          for (const line of dec.decode(value, { stream: true }).split('\n')) {
+            if (!line.startsWith('data: ')) continue;
+            const d = line.slice(6).trim();
+            if (d === '[DONE]') continue;
+            try {
+              const p = JSON.parse(d);
+              if (p.type === 'content_block_delta' && p.delta?.text) {
+                currentVersions[fmt] += p.delta.text;
+                if (currentTab === fmt) setDisplay(currentVersions[fmt], true);
+              }
+            } catch {}
+          }
+        }
+        generationDone[fmt] = true;
+        if (currentTab === fmt) setDisplay(currentVersions[fmt], false);
+        doneTab(fmt);
+      } catch (err) {
+        currentVersions[fmt] = `Ошибка: ${err.message}`;
+        generationDone[fmt] = true;
+        doneTab(fmt);
+        if (currentTab === fmt) setDisplay(currentVersions[fmt], false);
+      }
+    }));
+  } catch (err) {
+    errorBanner.textContent = 'Ошибка: ' + err.message;
+    errorBanner.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btnText.textContent = '✨ Сгенерировать с AI';
+    loadingWrap.style.display = 'none';
+    const cp = document.getElementById('btn-copy');
+    if (cp) cp.disabled = false;
+    const t = document.querySelector('.result-title');
+    if (t) t.textContent = '🎉 Готово!';
+    const s = document.querySelector('.result-sub');
+    if (s) s.textContent = 'Выбери формат и скопируй текст';
+  }
+}
+
+function renderShell() {
+  document.getElementById('result-container').innerHTML = `
+    <div class="result-card" id="result-card">
+      <div class="result-title">✍️ Пишу тексты…</div>
+      <div class="result-sub">Claude генерирует три версии одновременно</div>
+      <div class="tabs">
+        <button class="tab active-hh" id="tab-hh" onclick="switchTab('hh')"><span id="lbl-hh">HH.ru</span><span class="tab-spinner" id="spin-hh"></span></button>
+        <button class="tab" id="tab-tg" onclick="switchTab('tg')"><span id="lbl-tg">Telegram</span><span class="tab-spinner" id="spin-tg"></span></button>
+        <button class="tab" id="tab-portal" onclick="switchTab('portal')"><span id="lbl-portal">Портал</span><span class="tab-spinner" id="spin-portal"></span></button>
+      </div>
+      <div class="result-text streaming" id="result-text"></div>
+      <div class="actions">
+        <button class="btn-copy" id="btn-copy" onclick="copyText()" disabled>📋 Скопировать</button>
+        <button class="btn-reset" onclick="resetForm()">← Новая вакансия</button>
+      </div>
+    </div>`;
+  setTimeout(() => {
+    document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function setDisplay(text, streaming) {
+  const el = document.getElementById('result-text');
+  if (!el) return;
+  el.textContent = text;
+  streaming ? el.classList.add('streaming') : el.classList.remove('streaming');
+}
+
+function doneTab(fmt) {
+  const names = { hh: 'HH.ru', tg: 'Telegram', portal: 'Портал' };
+  const lbl = document.getElementById('lbl-' + fmt);
+  if (lbl) lbl.textContent = names[fmt];
+  // Replace spinner with checkmark
+  const spin = document.getElementById('spin-' + fmt);
+  if (spin) {
+    const check = document.createElement('span');
+    check.className = 'tab-check ' + fmt;
+    check.id = 'check-' + fmt;
+    check.textContent = '✓';
+    spin.replaceWith(check);
+  }
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  const el = document.getElementById('result-text');
+  if (!el) return;
+  el.style.opacity = '0';
+  setTimeout(() => {
+    el.textContent = currentVersions[tab] || '';
+    generationDone[tab] ? el.classList.remove('streaming') : el.classList.add('streaming');
+    el.style.opacity = '1';
+  }, 120);
+  const cls = { hh: 'active-hh', tg: 'active-tg', portal: 'active-portal' };
+  ['hh', 'tg', 'portal'].forEach(t => {
+    const b = document.getElementById('tab-' + t);
+    if (!b) return;
+    b.className = 'tab';
+    if (t === tab) b.classList.add(cls[t]);
+  });
+  const cp = document.getElementById('btn-copy');
+  if (cp) { cp.innerHTML = '📋 Скопировать'; cp.classList.remove('copied'); }
+}
+
+function copyText() {
+  const text = currentVersions[currentTab];
+  if (!text) return;
+  const btn = document.getElementById('btn-copy');
+  const done = () => {
+    btn.innerHTML = '✅ Скопировано!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = '📋 Скопировать'; btn.classList.remove('copied'); }, 2000);
+  };
+  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done); }
+  else { const ta = Object.assign(document.createElement('textarea'), { value: text, style: 'position:fixed;opacity:0' }); document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done(); }
+}
+
+function resetForm() {
+  document.getElementById('result-container').innerHTML = '';
+  ['role', 'team', 'tasks', 'requirements'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('grade').value = '';
+  document.getElementById('tone').value = '';
+  ['field-role', 'field-grade', 'field-tasks', 'field-requirements'].forEach(id => document.getElementById(id).classList.remove('error'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
